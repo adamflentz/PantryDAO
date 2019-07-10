@@ -1,0 +1,48 @@
+version: '3'
+services:
+  pantrymysql:
+    container_name: pantrymysql
+    restart: always
+    image: mysql
+    environment:
+    - MYSQL_ROOT_PASSWORD=password
+    - MYSQL_USER=adam
+    - MYSQL_PASSWORD=password
+    - MYSQL_DATABASE=pantry
+    - MYSQL_ONETIME_PASSWORD=true
+  pantryspringapp:
+    image: pantryspringapp
+    links:
+    - "pantrymysql"
+    ports:
+    - "8080:8080"
+    environment:
+    - SPRING_DATASOURCE_URL=jdbc:mysql://pantrymysql:3306/pantry?useSSL=false&allowPublicKeyRetrieval=true
+    - SPRING_DATASOURCE_USERNAME=adam
+    - SPRING_DATASOURCE_PASSWORD=password
+    - pantryuser.authentication.serviceUrl=http://pantryuser:8081/authenticate
+    - pantryuser.authentication.readTimeout=5000
+    - pantryuser.authentication.connectTimeout=5000
+  pantryfrontend:
+    image:
+    links:
+  usermysql:
+    container_name: usermysql
+    restart: always
+    image: mysql
+    environment:
+    - MYSQL_ROOT_PASSWORD=password
+    - MYSQL_USER=adam
+    - MYSQL_PASSWORD=password
+    - MYSQL_DATABASE=user
+    - MYSQL_ONETIME_PASSWORD=true
+  pantryuser:
+    image:
+    links:
+    - "usermysql"
+    ports:
+      "8081:8080"
+    environment:
+    - SPRING_DATASOURCE_URL=jdbc:mysql://usermysql:3306/pantry?useSSL=false&allowPublicKeyRetrieval=true
+    - SPRING_DATASOURCE_USERNAME=adam
+    - SPRING_DATASOURCE_PASSWORD=password
